@@ -7,6 +7,8 @@ class SequentialNetworkRequestsRxViewModel(
 ) : BaseViewModel<UiState>() {
 
     fun perform2SequentialNetworkRequest() {
+        uiState.value = UiState.Loading
 
+        mockApi.getRecentAndroidVersions()
     }
 }
