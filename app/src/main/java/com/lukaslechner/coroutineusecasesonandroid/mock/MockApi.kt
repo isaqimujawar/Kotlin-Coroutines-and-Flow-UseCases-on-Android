@@ -10,7 +10,7 @@ import retrofit2.http.Path
 interface MockApi {
 
     @GET("recent-android-versions")
-    suspend fun getRecentAndroidVersions(): List<AndroidVersion>
+    suspend fun getRecentAndroidVersions(): List<AndroidVersion>       // this is a suspend function
 
     @GET("android-version-features/{apiLevel}")
     suspend fun getAndroidVersionFeatures(@Path("apiLevel") apiLevel: Int): VersionFeatures
