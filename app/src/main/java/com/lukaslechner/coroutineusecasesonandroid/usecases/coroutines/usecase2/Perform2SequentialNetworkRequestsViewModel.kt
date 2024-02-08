@@ -4,18 +4,16 @@ import androidx.lifecycle.viewModelScope
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
 import com.lukaslechner.coroutineusecasesonandroid.mock.MockApi
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class Perform2SequentialNetworkRequestsViewModel(
     private val mockApi: MockApi = mockApi()
 ) : BaseViewModel<UiState>() {
 
     fun perform2SequentialNetworkRequest() {
-        // TODO: Exercise 1
-        // switch to branch "coroutine_course_full" to see solution
-
-        // running Coroutine inside a viewModelScope and launch coroutine builder
         uiState.value = UiState.Loading
 
+        // running Coroutine inside a viewModelScope and launch coroutine builder
         viewModelScope.launch {
             try {
                 val recentVersions = mockApi.getRecentAndroidVersions()
@@ -24,6 +22,7 @@ class Perform2SequentialNetworkRequestsViewModel(
                 uiState.value = UiState.Success(featuresOfMostRecentVersion)
             }
             catch (exception: Exception) {
+                Timber.e(exception)
                 uiState.value = UiState.Error("Network request failed!")
             }
         }

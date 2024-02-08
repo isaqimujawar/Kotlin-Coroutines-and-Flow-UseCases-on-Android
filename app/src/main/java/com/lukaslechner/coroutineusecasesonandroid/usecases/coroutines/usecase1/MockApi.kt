@@ -10,6 +10,8 @@ fun mockApi() =
         MockNetworkInterceptor()
             .mock(
                 "http://localhost/recent-android-versions",
+//                 { "Something went wrong" },
+//                 500,
                 { Gson().toJson(mockAndroidVersions) },
                 200,
                 1500
