@@ -16,7 +16,7 @@ import java.lang.RuntimeException
 
 fun main() {
     val scope =
-        CoroutineScope(context = Job() + exceptionHandler)
+        CoroutineScope(context = SupervisorJob() + exceptionHandler)
 
     scope.launch {
         println("Coroutine 1 starts")
