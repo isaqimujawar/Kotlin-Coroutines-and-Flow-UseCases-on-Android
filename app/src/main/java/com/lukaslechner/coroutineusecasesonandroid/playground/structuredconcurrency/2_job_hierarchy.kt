@@ -5,22 +5,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Section 9 Structured Concurrency 2
+ *  - Coroutines started in the same scope form a hierarchy.
+ */
 fun main() {
     val scopeJob = Job()
     val scope = CoroutineScope(scopeJob)
 
-    var childCoroutineJob: Job? = null
-    val coroutineJob = scope.launch {
-        childCoroutineJob = launch {
-            println("Starting child coroutine")
-            delay(1000)
-        }
-
+    val passedJob = Job()
+    val coroutineJob = scope.launch(passedJob) {
         println("Starting coroutine")
         delay(1000)
     }
 
-    Thread.sleep(500)
+    Thread.sleep(100)
+    println("passedJob and coroutineJob are references to the same object: ${passedJob === coroutineJob}")
     println("Is coroutineJob a child of scopeJob => ${scopeJob.children.contains(coroutineJob)}")
-    println("Is childCoroutineJob a child of coroutineJob => ${coroutineJob.children.contains(childCoroutineJob)}")
+    println("Is passedJob a child of scopeJob => ${scopeJob.children.contains(passedJob)}")
+        println("Is coroutineJob a child of passedJob => ${passedJob.children.contains(coroutineJob)}")
 }
