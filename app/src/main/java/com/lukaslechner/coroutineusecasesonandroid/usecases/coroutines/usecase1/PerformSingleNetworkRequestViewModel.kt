@@ -15,7 +15,9 @@ class PerformSingleNetworkRequestViewModel(
     fun performSingleNetworkRequest() {
         uiState.value = UiState.Loading
 
-        val job = viewModelScope.launch(Dispatchers.Main) {
+        // By default, viewModelScope uses Disptachers.Main.immediate
+        // We can modify the default dispatcher of the scope e.g., launch(Dispatchers.Main)
+        val job = viewModelScope.launch {
             Timber.tag("viewModelScope").d("I'm the first statement in the coroutine")
             try {
                 val recentAndroidVersions = mockApi.getRecentAndroidVersions()
