@@ -1,9 +1,11 @@
 package com.lukaslechner.coroutineusecasesonandroid.usecases.coroutines.usecase1
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
 import com.lukaslechner.coroutineusecasesonandroid.mock.AndroidVersion
 import com.lukaslechner.coroutineusecasesonandroid.mock.MockApi
 import com.lukaslechner.coroutineusecasesonandroid.mock.mockAndroidVersions
+import com.lukaslechner.coroutineusecasesonandroid.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -15,9 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -27,7 +27,7 @@ import retrofit2.Response
 @ExperimentalCoroutinesApi
 class PerformSingleNetworkRequestViewModelTest {
 
-    @Before
+    /*@Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
@@ -35,14 +35,20 @@ class PerformSingleNetworkRequestViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-    }
+    }*/
+
+//    @get:Rule
+//    val mainCoroutineScopeRule = MainCoroutineScopeRule()
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @get:Rule
     val instantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
 
     private val receivedUiStates = mutableListOf<UiState>()
 
-    private fun observeViewModel(viewModel: PerformSingleNetworkRequestViewModel) {
+    private fun observeViewModel(viewModel: BaseViewModel<UiState>) {
         viewModel.uiState().observeForever { uiState ->
             if (uiState != null)
                 receivedUiStates.add(uiState)
