@@ -29,10 +29,12 @@ class PerformSingleNetworkRequestViewModelTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @After
     fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @get:Rule
@@ -75,10 +77,6 @@ class PerformSingleNetworkRequestViewModelTest {
     @Test
     fun `should return Success when network request is successful using mockk`() = runTest {
         // Arrange
-
-        val dispatcher = UnconfinedTestDispatcher()
-        Dispatchers.setMain(dispatcher)
-
         val mockApi = mockk<MockApi>()
         coEvery { mockApi.getRecentAndroidVersions() } returns mockAndroidVersions
 
@@ -98,14 +96,11 @@ class PerformSingleNetworkRequestViewModelTest {
         coVerify(exactly = 1) {
             mockApi.getRecentAndroidVersions()
         }
-
-        Dispatchers.resetMain()
     }
 
     @Test
     fun `should return Error when network request fails`() = runTest {
         // Arrange
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         val fakeApi = FakeErrorApi()
         val viewModel = PerformSingleNetworkRequestViewModel(fakeApi)
         observeViewModel(viewModel)
@@ -118,15 +113,11 @@ class PerformSingleNetworkRequestViewModelTest {
             listOf(UiState.Loading, UiState.Error("Network request failed!")),
             receivedUiStates
         )
-
-        Dispatchers.resetMain()
     }
 
     @Test
     fun `should return Error when network request fails with mockk`() = runTest {
         // Arrange
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-
         val mockApi = mockk<MockApi>()
         coEvery { mockApi.getRecentAndroidVersions() } answers {
             throw HttpException(
@@ -153,7 +144,5 @@ class PerformSingleNetworkRequestViewModelTest {
         coVerify(exactly = 1) {
             mockApi.getRecentAndroidVersions()
         }
-
-        Dispatchers.resetMain()
     }
 }
