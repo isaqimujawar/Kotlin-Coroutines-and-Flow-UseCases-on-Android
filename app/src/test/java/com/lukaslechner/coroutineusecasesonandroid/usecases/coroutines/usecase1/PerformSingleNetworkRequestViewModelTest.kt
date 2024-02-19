@@ -101,4 +101,59 @@ class PerformSingleNetworkRequestViewModelTest {
 
         Dispatchers.resetMain()
     }
+
+    @Test
+    fun `should return Error when network request fails`() = runTest {
+        // Arrange
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+        val fakeApi = FakeErrorApi()
+        val viewModel = PerformSingleNetworkRequestViewModel(fakeApi)
+        observeViewModel(viewModel)
+
+        // Act
+        viewModel.performSingleNetworkRequest()
+
+        // Assert
+        assertEquals(
+            listOf(UiState.Loading, UiState.Error("Network request failed!")),
+            receivedUiStates
+        )
+
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `should return Error when network request fails with mockk`() = runTest {
+        // Arrange
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        val mockApi = mockk<MockApi>()
+        coEvery { mockApi.getRecentAndroidVersions() } answers {
+            throw HttpException(
+                Response.error<List<AndroidVersion>>(
+                    500,
+                    ResponseBody.create(MediaType.parse("application/json"), "")
+                )
+            )
+        }
+
+        val viewModel = PerformSingleNetworkRequestViewModel(mockApi)
+        observeViewModel(viewModel)
+
+        // Act
+        viewModel.performSingleNetworkRequest()
+
+        // Assert
+        assertEquals(
+            listOf(UiState.Loading, UiState.Error("Network request failed!")),
+            receivedUiStates
+        )
+
+        // verify
+        coVerify(exactly = 1) {
+            mockApi.getRecentAndroidVersions()
+        }
+
+        Dispatchers.resetMain()
+    }
 }
