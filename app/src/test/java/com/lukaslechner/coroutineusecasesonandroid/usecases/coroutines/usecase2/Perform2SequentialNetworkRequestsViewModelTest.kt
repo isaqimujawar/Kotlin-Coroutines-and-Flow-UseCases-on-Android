@@ -2,21 +2,16 @@ package com.lukaslechner.coroutineusecasesonandroid.usecases.coroutines.usecase2
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
-import com.lukaslechner.coroutineusecasesonandroid.mock.AndroidVersion
 import com.lukaslechner.coroutineusecasesonandroid.mock.MockApi
 import com.lukaslechner.coroutineusecasesonandroid.mock.mockAndroidVersions
 import com.lukaslechner.coroutineusecasesonandroid.mock.mockVersionFeaturesAndroid10
 import com.lukaslechner.coroutineusecasesonandroid.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
-import retrofit2.HttpException
-import retrofit2.Response
 
 class Perform2SequentialNetworkRequestsViewModelTest {
 
@@ -26,6 +21,7 @@ class Perform2SequentialNetworkRequestsViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
     @get:Rule
     val instantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
 
@@ -52,8 +48,10 @@ class Perform2SequentialNetworkRequestsViewModelTest {
         assertEquals(
             listOf(
                 UiState.Loading,
-                UiState.Success(mockVersionFeaturesAndroid10)),
-            receivedUiStates)
+                UiState.Success(mockVersionFeaturesAndroid10)
+            ),
+            receivedUiStates
+        )
     }
 
     @Test
@@ -63,14 +61,7 @@ class Perform2SequentialNetworkRequestsViewModelTest {
         val viewModel = Perform2SequentialNetworkRequestsViewModel(mockApi)
         observeViewModel(viewModel)
 
-        coEvery { mockApi.getRecentAndroidVersions() } answers {
-            throw HttpException(
-                Response.error<List<AndroidVersion>>(
-                    500,
-                    ResponseBody.create(MediaType.parse("application/json"), "")
-                )
-            )
-        }
+        coEvery { mockApi.getRecentAndroidVersions() } answers { throw Exception() }
 
         // Act
         viewModel.perform2SequentialNetworkRequest()
@@ -79,7 +70,7 @@ class Perform2SequentialNetworkRequestsViewModelTest {
         assertEquals(
             listOf(UiState.Loading, UiState.Error("Network request failed!")),
             receivedUiStates
-            )
+        )
     }
 
     @Test
@@ -89,14 +80,8 @@ class Perform2SequentialNetworkRequestsViewModelTest {
         val viewModel = Perform2SequentialNetworkRequestsViewModel(mockApi)
         observeViewModel(viewModel)
 
-        coEvery { mockApi.getAndroidVersionFeatures(29) } answers {
-            throw HttpException(
-                Response.error<List<AndroidVersion>>(
-                    500,
-                    ResponseBody.create(MediaType.parse("application/json"), "")
-                )
-            )
-        }
+        coEvery { mockApi.getAndroidVersionFeatures(29) } answers { throw Exception() }
+
         // Act
         viewModel.perform2SequentialNetworkRequest()
 
