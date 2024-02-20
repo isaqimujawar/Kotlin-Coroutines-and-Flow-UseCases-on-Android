@@ -44,7 +44,7 @@ class TestClass {
         val virtualTimeStart = currentTime
 
         functionThatStartsNewCoroutine()
-        //advanceTimeBy(1000)       // This method is deprecated
+        // advanceTimeBy(1000)       // This method is deprecated
         advanceUntilIdle()
 
         val realTimeDuration = System.currentTimeMillis() - realTimeStart
