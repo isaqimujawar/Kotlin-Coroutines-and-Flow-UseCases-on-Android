@@ -32,16 +32,6 @@ class FlowUseCase1Activity : BaseActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.startFlowCollection()
-    }
-
-    override fun onStop() {
-        viewModel.stopFlowCollection()
-        super.onStop()
-    }
-
     private fun render(uiState: UiState) {
         when (uiState) {
             is UiState.Loading -> {
