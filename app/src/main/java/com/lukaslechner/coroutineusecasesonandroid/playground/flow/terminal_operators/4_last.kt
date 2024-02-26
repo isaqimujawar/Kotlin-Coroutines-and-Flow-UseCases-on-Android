@@ -1,7 +1,9 @@
-package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminaloperators
+package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminal_operators
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.runBlocking
 
 fun main() {
     val flow = flow {
@@ -14,11 +16,8 @@ fun main() {
         emit(2)
     }
 
-    val list = buildList {
-        add(1)
-        println("add 1 to list")
-
-        add(2)
-        println("add 2 to list")
+    runBlocking {
+        val item = flow.lastOrNull()
+        println("Last received: $item")
     }
 }

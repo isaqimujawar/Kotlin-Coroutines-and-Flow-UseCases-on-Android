@@ -1,4 +1,4 @@
-package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminaloperators
+package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminal_operators
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

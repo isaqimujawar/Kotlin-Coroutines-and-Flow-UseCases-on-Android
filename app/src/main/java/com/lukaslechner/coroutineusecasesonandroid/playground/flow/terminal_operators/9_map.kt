@@ -1,9 +1,8 @@
-package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminaloperators
+package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminal_operators
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.runBlocking
 
 fun main() {
@@ -18,9 +17,8 @@ fun main() {
     }
 
     runBlocking {
-        val item = flow
-            .map { emittedValue -> emittedValue * 10 }
-            .reduce { accumulator, mapValue -> accumulator + mapValue }
-        println("Received: $item")
+        flow
+            .map { emittedValue -> emittedValue * 10 }          // applying the transform function
+            .collect { value -> println("Received: $value") }
     }
 }

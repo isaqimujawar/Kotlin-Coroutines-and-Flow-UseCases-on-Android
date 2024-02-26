@@ -1,8 +1,8 @@
-package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminaloperators
+package com.lukaslechner.coroutineusecasesonandroid.playground.flow.terminal_operators
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 
 fun main() {
@@ -13,11 +13,11 @@ fun main() {
 
         delay(100)
         println("emitting second value")
-        // emit(2)
+        emit(2)
     }
 
     runBlocking {
-        val item = flow.single()
-        println("Received: $item")
+        val item = flow.first {it > 1}
+        println("Received $item")
     }
 }
