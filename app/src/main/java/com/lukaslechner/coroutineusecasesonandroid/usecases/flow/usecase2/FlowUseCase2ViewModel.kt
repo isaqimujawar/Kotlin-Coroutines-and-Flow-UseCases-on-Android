@@ -1,8 +1,14 @@
 package com.lukaslechner.coroutineusecasesonandroid.usecases.flow.usecase2
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
+import com.lukaslechner.coroutineusecasesonandroid.usecases.flow.mock.Stock
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class FlowUseCase2ViewModel(
     stockPriceDataSource: StockPriceDataSource,
@@ -23,5 +29,28 @@ class FlowUseCase2ViewModel(
 
      */
 
-    val currentStockPriceAsLiveData: LiveData<UiState> = TODO()
+    val currentStockPriceAsLiveData: MutableLiveData<UiState> = MutableLiveData()
+
+    init {
+        val list = mutableListOf<Stock>()
+        viewModelScope.launch {
+            stockPriceDataSource
+                .latestStockList
+                .take(10)
+                .onCompletion {
+                    Timber.d("Flow cancelled")
+                }
+                .collect {
+                    Timber.d("collecting from flow")
+                    list.addAll(it)
+                    val usList = list
+                        .filter { it.country == "United States" }
+                        .filter { it.name != "Apple" }
+                        .filter { it.name != "Microsoft" }
+                        .take(10)
+                    currentStockPriceAsLiveData.value = UiState.Success(usList)
+                }
+        }
+
+    }
 }
