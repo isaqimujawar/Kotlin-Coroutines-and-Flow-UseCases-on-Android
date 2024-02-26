@@ -1,13 +1,15 @@
 package com.lukaslechner.coroutineusecasesonandroid.usecases.flow.usecase2
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
-import com.lukaslechner.coroutineusecasesonandroid.usecases.flow.mock.Stock
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 
 class FlowUseCase2ViewModel(
@@ -29,28 +31,26 @@ class FlowUseCase2ViewModel(
 
      */
 
-    val currentStockPriceAsLiveData: MutableLiveData<UiState> = MutableLiveData()
-
-    init {
-        val list = mutableListOf<Stock>()
-        viewModelScope.launch {
-            stockPriceDataSource
-                .latestStockList
-                .take(10)
-                .onCompletion {
-                    Timber.d("Flow cancelled")
-                }
-                .collect {
-                    Timber.d("collecting from flow")
-                    list.addAll(it)
-                    val usList = list
-                        .filter { it.country == "United States" }
-                        .filter { it.name != "Apple" }
-                        .filter { it.name != "Microsoft" }
-                        .take(10)
-                    currentStockPriceAsLiveData.value = UiState.Success(usList)
-                }
+    val currentStockPriceAsLiveData: LiveData<UiState> = stockPriceDataSource
+        .latestStockList
+        .take(10)
+        .onStart {
+            Timber.d("Flow collection started")
         }
-
-    }
+        .onCompletion {
+            if (it == null)
+                Timber.d("Completed successfully")
+        }
+        .onEach {
+            Timber.d("OnEach() received new List<Stock>")
+        }
+        .transform {
+            val newList = it
+                .take(10)
+                .filter { it.country == "United States" }
+                .filter { it.name != "Apple" }
+                .filter { it.name != "Microsoft" }
+            emit(UiState.Success(newList) as UiState)
+        }
+        .asLiveData(Dispatchers.Default)
 }
