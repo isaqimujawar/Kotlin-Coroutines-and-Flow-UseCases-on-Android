@@ -1,8 +1,27 @@
 package com.lukaslechner.coroutineusecasesonandroid.usecases.flow.usecase2
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.withIndex
+import timber.log.Timber
+
+/**
+ * Some points on the filter{} function used in this exercise:
+ *  - filter{} will only allow a flow that matches the given predicate
+ * - This filter{} block will find the Google Stock and get it's currentPrice
+ * - if the currentPrice is null, then it will return@filter with false value
+ * - if the currentPrice is is notNull, then it will check is the currentPrice > 2300
+ * - this will return true or false based on the currentPrice
+ */
 
 class FlowUseCase2ViewModel(
     stockPriceDataSource: StockPriceDataSource,
@@ -23,5 +42,41 @@ class FlowUseCase2ViewModel(
 
      */
 
-    val currentStockPriceAsLiveData: LiveData<UiState> = TODO()
+    val currentStockPriceAsLiveData: LiveData<UiState> = stockPriceDataSource
+        .latestStockList
+        .onStart { Timber.d("Flow collection started") }
+        .filter { stockList ->
+            val googlePrice = stockList.find { stock ->
+                stock.name == "Alphabet (Google)"
+            }?.currentPrice ?: return@filter false
+
+            googlePrice > 2300
+        }
+        .transform { stockList ->
+            val newList = stockList
+                .filter { it.country == "United States" }
+                .filter { it.name != "Apple" && it.name != "Microsoft" }
+                .mapIndexed { index, stock -> stock.copy(rank = index + 1) }
+                .take(10)
+            emit(newList)
+        }
+        .take(10)
+        .withIndex()
+        .onEach { indexedValue ->
+            Timber.d("Processing Emission: ${indexedValue.index + 1}")
+        }
+        .map { indexedValue ->
+            indexedValue.value
+        }
+        .map { stockList ->
+            UiState.Success(stockList) as UiState
+        }
+        .onStart {
+            emit(UiState.Loading)
+        }
+        .onCompletion {
+            if (it == null)
+                Timber.d("Completed successfully")
+        }
+        .asLiveData(defaultDispatcher)
 }

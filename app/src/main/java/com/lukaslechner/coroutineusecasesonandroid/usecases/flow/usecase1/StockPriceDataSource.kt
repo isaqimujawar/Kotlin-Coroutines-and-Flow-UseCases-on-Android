@@ -15,7 +15,7 @@ class NetworkStockPriceDataSource(mockApi: FlowMockApi) : StockPriceDataSource {
 
     override val latestStockList: Flow<List<Stock>> = flow {
         while (true) {
-            Timber.tag("Flow").d("Fetching current stock prices")
+            Timber.tag("Flow").d("Fetching current stock prices.")
             val currentStockList = mockApi.getCurrentStockPrices()
             emit(currentStockList)
             delay(5_000)
