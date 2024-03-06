@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import com.lukaslechner.coroutineusecasesonandroid.base.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -52,6 +53,7 @@ class FlowUseCase2ViewModel(
 
             googlePrice > 2300
         }
+        .cancellable()      // Adding cancellable() operator before an expensive operator to make it cooperative regarding cancellation.
         .transform { stockList ->
             val newList = stockList
                 .filter { it.country == "United States" }

@@ -11,6 +11,19 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.coroutines.EmptyCoroutineContext
 
+/**
+ * Flow.cancellable()
+ * public fun <T> Flow<T>.cancellable(): Flow<T>
+ *
+ * Returns a flow which checks cancellation status on each emission and
+ * throws the corresponding cancellation cause if flow collector was cancelled.
+ *
+ * Note that
+ *     flow{} builder and all implementations of SharedFlow are cancellable by default.
+ *
+ * This operator provides a shortcut for
+ * .onEach { currentCoroutineContext().ensureActive() }
+ */
 suspend fun main() {
     val scope = CoroutineScope(EmptyCoroutineContext)
 
