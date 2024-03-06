@@ -9,6 +9,7 @@ import com.lukaslechner.coroutineusecasesonandroid.databinding.ActivityFlowUseca
 import com.lukaslechner.coroutineusecasesonandroid.utils.setGone
 import com.lukaslechner.coroutineusecasesonandroid.utils.setVisible
 import com.lukaslechner.coroutineusecasesonandroid.utils.toast
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
@@ -22,22 +23,28 @@ class FlowUseCase4Activity : BaseActivity() {
         ViewModelFactory(NetworkStockPriceDataSource(mockApi(applicationContext)))
     }
 
+    private var job: Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.recyclerView.adapter = adapter
+    }
 
-        lifecycleScope.launch {
+    override fun onStart() {
+        super.onStart()
+
+        job = lifecycleScope.launch {
             viewModel.currentStockPriceAsFlow.collect { uiState ->
                 render(uiState)
             }
         }
+    }
 
-        lifecycleScope.launch {
-            viewModel.currentStockPriceAsFlow.collect { uiState ->
-                render(uiState)
-            }
-        }
+    override fun onStop() {
+        super.onStop()
+
+        job?.cancel()
     }
 
     private fun render(uiState: UiState) {
