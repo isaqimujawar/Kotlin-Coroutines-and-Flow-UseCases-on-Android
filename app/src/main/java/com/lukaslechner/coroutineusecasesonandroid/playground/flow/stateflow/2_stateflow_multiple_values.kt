@@ -24,5 +24,5 @@ fun main() {
         }
     }
 
-    Thread.sleep(600)
+    Thread.sleep(1000)
 }
