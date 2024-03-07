@@ -40,7 +40,13 @@ class FlowUseCase4Activity : BaseActivity() {
         // Using repeatOnLifecycle() to make the flow collection lifecycle-aware
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentStockPriceAsFlow.collect { uiState -> render(uiState) }
+                launch {
+                    viewModel.currentStockPriceAsFlow.collect { uiState -> render(uiState) }
+                }
+
+                launch {
+                    viewModel.currentStockPriceAsFlow.collect { uiState -> render(uiState) }
+                }
             }
         }
     }
