@@ -1,23 +1,27 @@
 package com.lukaslechner.coroutineusecasesonandroid.playground.flow.concurrency
 
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flow
 
 /**
- *  Buffers flow emissions via channel of a specified capacity and runs collector in a separate coroutine.
+ *  Buffers Overflow Strategy - DROP_LATEST
+ *      - Pancakes 3, 5 are dropped
+ *      - Pancakes 1, 2, 4 are Eaten
  */
 suspend fun main() = coroutineScope {
 
     val flow = flow {
         repeat(5) {
-            println("Emitter:       Start Cooking Pancake $it")
+            val pancakeIndex = it + 1
+            println("Emitter:       Start Cooking Pancake $pancakeIndex")
             delay(100)
-            println("Emitter:       Pancake $it ready")
-            emit(it)
+            println("Emitter:       Pancake $pancakeIndex ready")
+            emit(pancakeIndex)
         }
-    }.buffer()
+    }.buffer(capacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
 
     flow.collect {
         println("Collector:     Start eating pancake $it")
